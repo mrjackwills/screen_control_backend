@@ -1,0 +1,50 @@
+[package]
+name = "screen_control"
+version = "0.1.0"
+edition = "2021"
+authors = ["Jack Wills <email@mrjackwills.com>"]
+description = "Toggle the screen power"
+
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+nursery = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+unused_async = "warn"
+unwrap_used = "warn"
+expect_used = "warn"
+todo = "warn"
+module_name_repetitions = "allow"
+doc_markdown = "allow"
+
+[dependencies]
+dotenvy = "0.15"
+futures-util = "0.3"
+local-ip-address = "0.6.1"
+mimalloc = "0.1.43"
+reqwest = { version = "0.12", default-features = false, features = [
+	"brotli",
+	"gzip",
+	"json",
+	"rustls-tls-native-roots",
+] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+simple-signal = "1.1"
+sudo = "0.6.0"
+thiserror = "1.0"
+time = "0.3.36"
+tokio = { version = "1.39", features = ["full"] }
+tokio-tungstenite = { version = "0.23", features = ["rustls-tls-native-roots"] }
+tracing = "0.1"
+tracing-subscriber = "0.3"
+url = "2.5"
+
+[profile.release]
+lto = true
+codegen-units = 1
+panic = 'abort'
+strip = true
+debug = false

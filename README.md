@@ -37,6 +37,7 @@ Envs that are used by `screen_control`
 | `WS_APIKEY`        | WS API key          | ✓        |
 | `WS_PASSWORD`      | WS API password     | ✓        |
 | `WS_TOKEN_ADDRESS` | WS token-server URL | ✓        |
+| `LOG_LEVEL`        | Log level to print  | ❌       |
 
 
 ## Arguments

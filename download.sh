@@ -9,7 +9,7 @@ esac
 
 if [ -n "$SUFFIX" ]; then
 	SCREEN_CTL="screen_control_linux_${SUFFIX}.tar.gz"
-	curk -L -O "https://github.com/mrjackwills/screen_control_backend/releases/latest/download/${SCREEN_CTL}"
+	curl -L -O "https://github.com/mrjackwills/screen_control_backend/releases/latest/download/${SCREEN_CTL}"
 	tar xzvf "${SCREEN_CTL}" screen_control
 	rm "${SCREEN_CTL}"
 fi

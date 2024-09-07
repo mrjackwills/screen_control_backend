@@ -24,7 +24,6 @@ fn get_user_name() -> Option<String> {
 }
 
 /// Check if unit file in systemd, and delete if true
-#[allow(clippy::cognitive_complexity)]
 fn uninstall_service() -> Result<(), AppError> {
     let service = get_service_name();
 
@@ -84,7 +83,6 @@ WantedBy=multi-user.target
     ))
 }
 /// If is sudo, and able to get a user name (which isn't root), install leafcast as a service
-#[allow(clippy::cognitive_complexity)]
 fn install_service() -> Result<(), AppError> {
     if let Some(user_name) = get_user_name() {
         info!("Create service file");

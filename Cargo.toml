@@ -1,6 +1,6 @@
 [package]
 name = "screen_control"
-version = "0.0.1"
+version = "0.0.2"
 edition = "2021"
 authors = ["Jack Wills <email@mrjackwills.com>"]
 description = "Toggle the screen power"
@@ -36,7 +36,7 @@ simple-signal = "1.1"
 sudo = "0.6.0"
 thiserror = "1.0"
 time = "0.3.36"
-tokio = { version = "1.39", features = ["full"] }
+tokio = { version = "1.40", features = ["full"] }
 tokio-tungstenite = { version = "0.23", features = ["rustls-tls-native-roots"] }
 tracing = "0.1"
 tracing-subscriber = "0.3"

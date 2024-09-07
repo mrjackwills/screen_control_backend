@@ -58,9 +58,9 @@ impl AppEnv {
         let local_env = ".env";
         let app_env = "/app_env/.env";
 
-        let env_path = if std::fs::metadata(app_env).is_ok() {
+        let env_path = if std::fs::exists(app_env).unwrap_or_default() {
             app_env
-        } else if std::fs::metadata(local_env).is_ok() {
+        } else if std::fs::exists(local_env).unwrap_or_default() {
             local_env
         } else {
             println!("\n\x1b[31munable to load env file\x1b[0m\n");
@@ -82,7 +82,7 @@ impl AppEnv {
 ///
 /// cargo watch -q -c -w src/ -x 'test env_ -- --nocapture'
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
+#[expect(clippy::unwrap_used)]
 mod tests {
     use super::*;
 

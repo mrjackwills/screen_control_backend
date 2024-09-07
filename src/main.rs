@@ -1,6 +1,3 @@
-// Only allow when debugging
-// #![allow(unused)]
-
 use mimalloc::MiMalloc;
 
 #[global_allocator]
@@ -110,7 +107,6 @@ async fn main() -> Result<(), AppError> {
 }
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
 mod tests {
     use std::time::SystemTime;
 

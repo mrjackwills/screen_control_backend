@@ -1,11 +1,11 @@
 use futures_util::lock::Mutex;
 use futures_util::SinkExt;
 use std::{process, sync::Arc, time::Instant};
-use tracing::{error, trace};
 
 use crate::sysinfo::SysInfo;
 use crate::ws_messages::{MessageValues, ParsedMessage, PiStatus, Response, StructuredResponse};
 use crate::{app_env::AppEnv, ws_messages::to_struct};
+use crate::{C, S};
 
 use super::WSWriter;
 
@@ -24,7 +24,7 @@ impl WSSender {
         writer: Arc<Mutex<WSWriter>>,
     ) -> Self {
         Self {
-            app_envs: app_envs.clone(),
+            app_envs: C!(app_envs),
             connected_instant,
             writer,
             unique: None,
@@ -35,20 +35,20 @@ impl WSSender {
     pub async fn on_text(&mut self, message: String) {
         if let Some(data) = to_struct(&message) {
             match data {
-                MessageValues::Invalid(error) => error!("invalid::{error:?}"),
+                MessageValues::Invalid(error) => tracing::error!("invalid::{error:?}"),
                 MessageValues::Valid(msg, unique) => {
                     self.unique = Some(unique);
                     match msg {
                         ParsedMessage::Status => (),
                         ParsedMessage::ScreenOff => {
                             if let Err(e) = SysInfo::turn_off().await {
-                                error!("{e}");
+                                tracing::error!("{e}");
                                 self.send_error("Unable to turn OFF screen").await;
                             }
                         }
                         ParsedMessage::ScreenOn => {
                             if let Err(e) = SysInfo::turn_on().await {
-                                error!("{e}");
+                                tracing::error!("{e}");
                                 self.send_error("Unable to turn ON screen").await;
                             }
                         }
@@ -68,9 +68,9 @@ impl WSSender {
             .send(StructuredResponse::data(response, unique))
             .await
         {
-            Ok(()) => trace!("Message sent"),
+            Ok(()) => tracing::trace!("Message sent"),
             Err(e) => {
-                error!("send_ws_response::SEND-ERROR::{e:?}");
+                tracing::error!("send_ws_response::SEND-ERROR::{e:?}");
                 process::exit(1);
             }
         }
@@ -78,7 +78,7 @@ impl WSSender {
 
     /// Send a unique error message
     pub async fn send_error(&self, message: &str) {
-        self.send_ws_response(Response::Error(message.to_owned()), self.unique.clone())
+        self.send_ws_response(Response::Error(S!(message)), C!(self.unique))
             .await;
     }
 

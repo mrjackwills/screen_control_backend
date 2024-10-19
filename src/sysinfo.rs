@@ -3,9 +3,8 @@ use std::process::Output;
 use local_ip_address::local_ip;
 use serde::{Deserialize, Serialize};
 use tokio::fs::read_to_string;
-// use tracing::error;
 
-use crate::{app_env::AppEnv, app_error::AppError, ws_messages::ScreenStatus};
+use crate::{app_env::AppEnv, app_error::AppError, ws_messages::ScreenStatus, S};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SysInfo {
@@ -89,13 +88,13 @@ impl SysInfo {
     /// Generate sysinfo struct, will valid data
     pub async fn new(app_envs: &AppEnv) -> Self {
         Self {
-            ip_address: local_ip().map_or("UNKNOWN".to_owned(), |i| i.to_string()),
+            ip_address: local_ip().map_or(S!("UNKNOWN"), |i| i.to_string()),
             uptime: Self::get_uptime().await,
             uptime_app: std::time::SystemTime::now()
                 .duration_since(app_envs.start_time)
                 .map_or(0, |value| value.as_secs()),
             screen_status: Self::screen_status().await,
-            version: env!("CARGO_PKG_VERSION").into(),
+            version: S!(env!("CARGO_PKG_VERSION")),
         }
     }
 }

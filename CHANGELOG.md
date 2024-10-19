@@ -1,3 +1,18 @@
+# <a href='https://github.com/mrjackwills/screen_control_backend/releases/tag/v0.0.3'>v0.0.3</a>
+### 2024-10-19
+
+### Chores
++ dependencies updated, [ecd86fa4](https://github.com/mrjackwills/screen_control_backend/commit/ecd86fa4e806f7933e3b75d165b4ef49f72b031f)
++ download.sh & create_release.sh updated, [c570f140](https://github.com/mrjackwills/screen_control_backend/commit/c570f14024da9e084151be5e5e3a72a49052e959)
++ .devcontainer updated, [9044bb4f](https://github.com/mrjackwills/screen_control_backend/commit/9044bb4f755391d476a0c447f80e8ab42997e013)
++ create_release.sh & download.sh updated, [eb5712f2](https://github.com/mrjackwills/screen_control_backend/commit/eb5712f20d9549100ebfe9d0398006225d67ce8a)
+
+### Features
++ S! and C! macros, [cdac8216](https://github.com/mrjackwills/screen_control_backend/commit/cdac82168a371dbd5632386c4db63a70da39fd60)
+
+### Refactors
++ qualify every tracing macro invocation, [9b69a537](https://github.com/mrjackwills/screen_control_backend/commit/9b69a53766cd26c2eeb6937081b403451d05a390)
+
 # <a href='https://github.com/mrjackwills/screen_control_backend/releases/tag/v0.0.2'>v0.0.2</a>
 ### 2024-09-07
 

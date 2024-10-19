@@ -1,12 +1,15 @@
-### 2024-09-07
+### 2024-10-19
 
 ### Chores
-+ Rut 1.81 linting, [762400102026c1a9ec0fc375a238beedabc94559]
-+ .devcontainer updated, [bd7282f2d4ccaeb2d6969d8d7a79a5ffb556a1d9]
-+ dependencies updated, [6ca77c435cf802d2ef0724c7ea9d8a92faaa7d15]
++ dependencies updated, [ecd86fa4e806f7933e3b75d165b4ef49f72b031f]
++ download.sh & create_release.sh updated, [c570f14024da9e084151be5e5e3a72a49052e959]
++ .devcontainer updated, [9044bb4f755391d476a0c447f80e8ab42997e013]
++ create_release.sh & download.sh updated, [eb5712f20d9549100ebfe9d0398006225d67ce8a]
 
-### Fixes
-+ install.sh typo, [8157b8c4608d24a2d7070c6a6c46896ff67942d0]
-+ use `fs::Exists`, [33146cef857b738ed374248f0ecd87dfd2fbe1f7]
+### Features
++ S! and C! macros, [cdac82168a371dbd5632386c4db63a70da39fd60]
+
+### Refactors
++ qualify every tracing macro invocation, [9b69a53766cd26c2eeb6937081b403451d05a390]
 
 see <a href='https://github.com/mrjackwills/screen_control_backend/blob/main/CHANGELOG.md'>CHANGELOG.md</a> for more details

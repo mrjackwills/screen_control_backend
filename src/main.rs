@@ -16,8 +16,26 @@ use app_env::AppEnv;
 use app_error::AppError;
 use sysinfo::SysInfo;
 use systemd::configure_systemd;
-use tracing::{error, Level};
 use ws::open_connection;
+
+/// Simple macro to create a new String, or convert from a &str to  a String - basically just gets rid of String::from() / .to_owned() etc
+#[macro_export]
+macro_rules! S {
+    () => {
+        String::new()
+    };
+    ($s:expr) => {
+        String::from($s)
+    };
+}
+
+/// Simple macro to call `.clone()` on whatever is passed in
+#[macro_export]
+macro_rules! C {
+    ($i:expr) => {
+        $i.clone()
+    };
+}
 
 fn close_signal() {
     tokio::spawn(async move {
@@ -28,7 +46,7 @@ fn close_signal() {
 
 fn setup_tracing(app_envs: Option<&AppEnv>) {
     tracing_subscriber::fmt()
-        .with_max_level(app_envs.map_or(Level::DEBUG, |i| i.log_level))
+        .with_max_level(app_envs.map_or(tracing::Level::DEBUG, |i| i.log_level))
         .init();
 }
 
@@ -83,19 +101,19 @@ async fn main() -> Result<(), AppError> {
             CliArg::Install | CliArg::Uninstall => {
                 setup_tracing(None);
                 if let Err(e) = configure_systemd(arg) {
-                    error!("{e:?}");
+                    tracing::error!("{e:?}");
                 }
             }
             CliArg::On => {
                 setup_tracing(None);
                 if let Err(e) = SysInfo::turn_on().await {
-                    error!("{e:?}");
+                    tracing::error!("{e:?}");
                 }
             }
             CliArg::Off => {
                 setup_tracing(None);
                 if let Err(e) = SysInfo::turn_off().await {
-                    error!("{e:?}");
+                    tracing::error!("{e:?}");
                 }
             }
             CliArg::Help => display_arg_info(),
@@ -116,10 +134,10 @@ mod tests {
         AppEnv {
             log_level: tracing::Level::INFO,
             start_time: SystemTime::now(),
-            ws_address: "ws_address".to_owned(),
-            ws_apikey: "ws_apikey".to_owned(),
-            ws_password: "ws_password".to_owned(),
-            ws_token_address: "ws_token_address".to_owned(),
+            ws_address: S!("ws_address"),
+            ws_apikey: S!("ws_apikey"),
+            ws_password: S!("ws_password"),
+            ws_token_address: S!("ws_token_address"),
         }
     }
 

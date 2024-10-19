@@ -11,7 +11,6 @@ use futures_util::{
 use std::{sync::Arc, time::Duration};
 use tokio::{net::TcpStream, task::JoinHandle};
 use tokio_tungstenite::{self, tungstenite::Message, MaybeTlsStream, WebSocketStream};
-use tracing::{error, info};
 
 use crate::{app_env::AppEnv, app_error::AppError, ws::ws_sender::WSSender, C};
 
@@ -60,7 +59,7 @@ async fn incoming_ws_message(mut reader: WSReader, ws_sender: WSSender) {
             _ => (),
         };
     }
-    info!("incoming_ws_message done");
+    tracing::info!("incoming_ws_message done");
 }
 
 /// need to spawn a new receiver on each connect
@@ -68,12 +67,12 @@ async fn incoming_ws_message(mut reader: WSReader, ws_sender: WSSender) {
 pub async fn open_connection(app_envs: AppEnv) -> Result<(), AppError> {
     let mut connection_details = ConnectionDetails::new();
     loop {
-        info!("in connection loop, awaiting delay then try to connect");
+        tracing::info!("in connection loop, awaiting delay then try to connect");
         connection_details.reconnect_delay().await;
 
         match ws_upgrade(&app_envs).await {
             Ok(socket) => {
-                info!("connected in ws_upgrade match");
+                tracing::info!("connected in ws_upgrade match");
                 connection_details.valid_connect();
 
                 let (writer, reader) = socket.split();
@@ -86,10 +85,10 @@ pub async fn open_connection(app_envs: AppEnv) -> Result<(), AppError> {
                 ws_sender.send_status().await;
                 incoming_ws_message(reader, ws_sender).await;
 
-                info!("aborted spawns, incoming_ws_message done, reconnect next");
+                tracing::info!("aborted spawns, incoming_ws_message done, reconnect next");
             }
             Err(e) => {
-                error!("connection::{e}");
+                tracing::error!("connection::{e}");
                 connection_details.fail_connect();
             }
         }

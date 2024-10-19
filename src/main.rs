@@ -16,7 +16,6 @@ use app_env::AppEnv;
 use app_error::AppError;
 use sysinfo::SysInfo;
 use systemd::configure_systemd;
-use tracing::{error, Level};
 use ws::open_connection;
 
 /// Simple macro to create a new String, or convert from a &str to  a String - basically just gets rid of String::from() / .to_owned() etc
@@ -48,7 +47,7 @@ fn close_signal() {
 
 fn setup_tracing(app_envs: Option<&AppEnv>) {
     tracing_subscriber::fmt()
-        .with_max_level(app_envs.map_or(Level::DEBUG, |i| i.log_level))
+        .with_max_level(app_envs.map_or(tracing::Level::DEBUG, |i| i.log_level))
         .init();
 }
 
@@ -103,19 +102,19 @@ async fn main() -> Result<(), AppError> {
             CliArg::Install | CliArg::Uninstall => {
                 setup_tracing(None);
                 if let Err(e) = configure_systemd(arg) {
-                    error!("{e:?}");
+                    tracing::error!("{e:?}");
                 }
             }
             CliArg::On => {
                 setup_tracing(None);
                 if let Err(e) = SysInfo::turn_on().await {
-                    error!("{e:?}");
+                    tracing::error!("{e:?}");
                 }
             }
             CliArg::Off => {
                 setup_tracing(None);
                 if let Err(e) = SysInfo::turn_off().await {
-                    error!("{e:?}");
+                    tracing::error!("{e:?}");
                 }
             }
             CliArg::Help => display_arg_info(),

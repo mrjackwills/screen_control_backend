@@ -13,7 +13,7 @@ use tokio::{net::TcpStream, task::JoinHandle};
 use tokio_tungstenite::{self, tungstenite::Message, MaybeTlsStream, WebSocketStream};
 use tracing::{error, info};
 
-use crate::{app_env::AppEnv, app_error::AppError, ws::ws_sender::WSSender};
+use crate::{app_env::AppEnv, app_error::AppError, ws::ws_sender::WSSender, C};
 
 type WsStream = WebSocketStream<MaybeTlsStream<TcpStream>>;
 type WSReader = SplitStream<WebSocketStream<MaybeTlsStream<TcpStream>>>;
@@ -32,7 +32,7 @@ impl AutoClose {
         if let Some(handle) = self.0.as_ref() {
             handle.abort();
         };
-        let ws_sender = ws_sender.clone();
+        let ws_sender = C!(ws_sender);
         self.0 = Some(tokio::spawn(async move {
             tokio::time::sleep(AUTO_CLOSE_TIME).await;
             ws_sender.close().await;
@@ -47,7 +47,7 @@ async fn incoming_ws_message(mut reader: WSReader, ws_sender: WSSender) {
     while let Ok(Some(message)) = reader.try_next().await {
         match message {
             Message::Text(message) => {
-                let mut ws_sender = ws_sender.clone();
+                let mut ws_sender = C!(ws_sender);
                 tokio::spawn(async move {
                     ws_sender.on_text(message).await;
                 });

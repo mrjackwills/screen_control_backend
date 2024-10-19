@@ -1,6 +1,7 @@
 use crate::{app_error::AppError, CliArg};
 use std::{env, fs, io::Write, path::Path, process::Command};
 use tracing::{error, info};
+use crate::S;
 
 const SYSTEMCTL: &str = "systemctl";
 const APP_NAME: &str = env!("CARGO_PKG_NAME");
@@ -8,7 +9,7 @@ const APP_NAME: &str = env!("CARGO_PKG_NAME");
 fn check_sudo() -> Result<(), AppError> {
     match sudo::check() {
         sudo::RunningAs::Root => Ok(()),
-        _ => Err(AppError::Internal("not running as sudo".into())),
+        _ => Err(AppError::Internal(S!("not running as sudo")))
     }
 }
 

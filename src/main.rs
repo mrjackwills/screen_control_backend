@@ -19,6 +19,26 @@ use systemd::configure_systemd;
 use tracing::{error, Level};
 use ws::open_connection;
 
+/// Simple macro to create a new String, or convert from a &str to  a String - basically just gets rid of String::from() / .to_owned() etc
+#[macro_export]
+macro_rules! S {
+    () => {
+        String::new()
+    };
+    ($s:expr) => {
+        String::from($s)
+    };
+}
+
+/// Simple macro to call `.clone()` on whatever is passed in
+#[macro_export]
+macro_rules! C {
+    ($i:expr) => {
+        $i.clone()
+    };
+}
+
+
 fn close_signal() {
     tokio::spawn(async move {
         tokio::signal::ctrl_c().await.ok();
@@ -116,10 +136,10 @@ mod tests {
         AppEnv {
             log_level: tracing::Level::INFO,
             start_time: SystemTime::now(),
-            ws_address: "ws_address".to_owned(),
-            ws_apikey: "ws_apikey".to_owned(),
-            ws_password: "ws_password".to_owned(),
-            ws_token_address: "ws_token_address".to_owned(),
+            ws_address: S!("ws_address"),
+            ws_apikey: S!("ws_apikey"),
+            ws_password: S!("ws_password"),
+            ws_token_address: S!("ws_token_address"),
         }
     }
 

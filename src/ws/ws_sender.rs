@@ -5,6 +5,7 @@ use tracing::{error, trace};
 
 use crate::sysinfo::SysInfo;
 use crate::ws_messages::{MessageValues, ParsedMessage, PiStatus, Response, StructuredResponse};
+use crate::{C, S};
 use crate::{app_env::AppEnv, ws_messages::to_struct};
 
 use super::WSWriter;
@@ -24,7 +25,7 @@ impl WSSender {
         writer: Arc<Mutex<WSWriter>>,
     ) -> Self {
         Self {
-            app_envs: app_envs.clone(),
+            app_envs: C!(app_envs),
             connected_instant,
             writer,
             unique: None,
@@ -78,7 +79,7 @@ impl WSSender {
 
     /// Send a unique error message
     pub async fn send_error(&self, message: &str) {
-        self.send_ws_response(Response::Error(message.to_owned()), self.unique.clone())
+        self.send_ws_response(Response::Error(S!(message)), C!(self.unique))
             .await;
     }
 

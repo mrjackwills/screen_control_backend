@@ -84,12 +84,14 @@ impl AppEnv {
 #[cfg(test)]
 #[expect(clippy::unwrap_used)]
 mod tests {
+    use crate::S;
+
     use super::*;
 
     #[tokio::test]
     async fn env_missing_env() {
         let mut map = HashMap::new();
-        map.insert("not_fish".to_owned(), "not_fish".to_owned());
+        map.insert(S!("not_fish"), S!("not_fish"));
 
         let result = AppEnv::parse_string("fish", &map);
 
@@ -100,7 +102,7 @@ mod tests {
     #[tokio::test]
     async fn env_parse_string_valid() {
         let mut map = HashMap::new();
-        map.insert("LOCATION_SQLITE".to_owned(), "/alarms.db".to_owned());
+        map.insert(S!("LOCATION_SQLITE"), S!("/alarms.db"));
 
         let result = AppEnv::parse_string("LOCATION_SQLITE", &map).unwrap();
 
@@ -110,9 +112,9 @@ mod tests {
     #[tokio::test]
     async fn env_parse_boolean_ok() {
         let mut map = HashMap::new();
-        map.insert("valid_true".to_owned(), "true".to_owned());
-        map.insert("valid_false".to_owned(), "false".to_owned());
-        map.insert("invalid_but_false".to_owned(), "as".to_owned());
+        map.insert(S!("valid_true"), S!("true"));
+        map.insert(S!("valid_false"), S!("false"));
+        map.insert(S!("invalid_but_false"), S!("as"));
 
         let result01 = AppEnv::parse_boolean("valid_true", &map);
         let result02 = AppEnv::parse_boolean("valid_false", &map);
@@ -127,27 +129,27 @@ mod tests {
 
     #[test]
     fn env_parse_log_valid() {
-        let map = HashMap::from([("RANDOM_STRING".to_owned(), "123".to_owned())]);
+        let map = HashMap::from([(S!("RANDOM_STRING"), S!("123"))]);
 
         let result = AppEnv::parse_log(&map);
 
         assert_eq!(result, tracing::Level::INFO);
 
-        let map = HashMap::from([("LOG_DEBUG".to_owned(), "false".to_owned())]);
+        let map = HashMap::from([(S!("LOG_DEBUG"), S!("false"))]);
 
         let result = AppEnv::parse_log(&map);
 
         assert_eq!(result, tracing::Level::INFO);
 
-        let map = HashMap::from([("LOG_TRACE".to_owned(), "false".to_owned())]);
+        let map = HashMap::from([(S!("LOG_TRACE"), S!("false"))]);
 
         let result = AppEnv::parse_log(&map);
 
         assert_eq!(result, tracing::Level::INFO);
 
         let map = HashMap::from([
-            ("LOG_DEBUG".to_owned(), "false".to_owned()),
-            ("LOG_TRACE".to_owned(), "false".to_owned()),
+            (S!("LOG_DEBUG"), S!("false")),
+            (S!("LOG_TRACE"), S!("false")),
         ]);
 
         let result = AppEnv::parse_log(&map);
@@ -155,8 +157,8 @@ mod tests {
         assert_eq!(result, tracing::Level::INFO);
 
         let map = HashMap::from([
-            ("LOG_DEBUG".to_owned(), "true".to_owned()),
-            ("LOG_TRACE".to_owned(), "false".to_owned()),
+            (S!("LOG_DEBUG"), S!("true")),
+            (S!("LOG_TRACE"), S!("false")),
         ]);
 
         let result = AppEnv::parse_log(&map);
@@ -164,8 +166,8 @@ mod tests {
         assert_eq!(result, tracing::Level::DEBUG);
 
         let map = HashMap::from([
-            ("LOG_DEBUG".to_owned(), "true".to_owned()),
-            ("LOG_TRACE".to_owned(), "true".to_owned()),
+            (S!("LOG_DEBUG"), S!("true")),
+            (S!("LOG_TRACE"), S!("true")),
         ]);
 
         let result = AppEnv::parse_log(&map);
@@ -173,8 +175,8 @@ mod tests {
         assert_eq!(result, tracing::Level::TRACE);
 
         let map = HashMap::from([
-            ("LOG_DEBUG".to_owned(), "false".to_owned()),
-            ("LOG_TRACE".to_owned(), "true".to_owned()),
+            (S!("LOG_DEBUG"), S!("false")),
+            (S!("LOG_TRACE"), S!("true")),
         ]);
 
         let result = AppEnv::parse_log(&map);

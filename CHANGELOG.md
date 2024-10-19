@@ -8,7 +8,7 @@
 + S! and C! macros, [cdac82168a371dbd5632386c4db63a70da39fd60]
 
 ### Refactors
-+ qualify every tracing macro invokation, [9b69a53766cd26c2eeb6937081b403451d05a390]
++ qualify every tracing macro invocation, [9b69a53766cd26c2eeb6937081b403451d05a390]
 
 # <a href='https://github.com/mrjackwills/screen_control_backend/releases/tag/v0.0.2'>v0.0.2</a>
 ### 2024-09-07

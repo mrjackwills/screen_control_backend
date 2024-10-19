@@ -4,8 +4,8 @@ use std::{process, sync::Arc, time::Instant};
 
 use crate::sysinfo::SysInfo;
 use crate::ws_messages::{MessageValues, ParsedMessage, PiStatus, Response, StructuredResponse};
-use crate::{C, S};
 use crate::{app_env::AppEnv, ws_messages::to_struct};
+use crate::{C, S};
 
 use super::WSWriter;
 

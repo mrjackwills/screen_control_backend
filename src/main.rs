@@ -37,7 +37,6 @@ macro_rules! C {
     };
 }
 
-
 fn close_signal() {
     tokio::spawn(async move {
         tokio::signal::ctrl_c().await.ok();

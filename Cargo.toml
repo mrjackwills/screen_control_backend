@@ -1,6 +1,6 @@
 [package]
 name = "screen_control"
-version = "0.0.3"
+version = "0.0.4"
 edition = "2021"
 authors = ["Jack Wills <email@mrjackwills.com>"]
 description = "Toggle the screen power"

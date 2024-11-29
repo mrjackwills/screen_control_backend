@@ -1,3 +1,9 @@
+### Chores
++ dependencies updated, [cb9a16e26aa07ebe9890d5cb08a7891ee8bfce42]
+
+### Features
++ spawn everything in main, [a537ab08ce0c4252adde4af728b15e8d1bcf5b91]
+
 # <a href='https://github.com/mrjackwills/screen_control_backend/releases/tag/v0.0.3'>v0.0.3</a>
 ### 2024-10-19
 

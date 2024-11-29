@@ -93,8 +93,7 @@ async fn run_as_client() -> Result<(), AppError> {
     Ok(())
 }
 
-#[tokio::main]
-async fn main() -> Result<(), AppError> {
+async fn start() -> Result<(), AppError> {
     sysinfo::SysInfo::set_wayland_env();
     if let Some(arg) = parse_arg(std::env::args()) {
         match arg {
@@ -121,6 +120,12 @@ async fn main() -> Result<(), AppError> {
     } else {
         run_as_client().await?;
     }
+    Ok(())
+}
+
+#[tokio::main]
+async fn main() -> Result<(), AppError> {
+    tokio::spawn(start()).await.ok();
     Ok(())
 }
 

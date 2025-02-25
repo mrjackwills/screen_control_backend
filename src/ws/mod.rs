@@ -4,15 +4,15 @@ mod connection_details;
 use connect::ws_upgrade;
 use connection_details::ConnectionDetails;
 use futures_util::{
+    StreamExt, TryStreamExt,
     lock::Mutex,
     stream::{SplitSink, SplitStream},
-    StreamExt, TryStreamExt,
 };
 use std::{sync::Arc, time::Duration};
 use tokio::{net::TcpStream, task::JoinHandle};
-use tokio_tungstenite::{self, tungstenite::Message, MaybeTlsStream, WebSocketStream};
+use tokio_tungstenite::{self, MaybeTlsStream, WebSocketStream, tungstenite::Message};
 
-use crate::{app_env::AppEnv, app_error::AppError, ws::ws_sender::WSSender, C};
+use crate::{C, app_env::AppEnv, app_error::AppError, ws::ws_sender::WSSender};
 
 type WsStream = WebSocketStream<MaybeTlsStream<TcpStream>>;
 type WSReader = SplitStream<WebSocketStream<MaybeTlsStream<TcpStream>>>;

@@ -167,7 +167,8 @@ check_tag() {
 			break
 			;;
 		*)
-			error_close "invalid option $REPLY"
+			echo -e "\n\"${REPLY}\" ${RED}- invalid option. Please select 1, 2, or 3.${RESET}"
+			continue
 			;;
 		esac
 	done
@@ -274,7 +275,7 @@ release_flow() {
 
 	echo -e "\ncargo fmt"
 	cargo fmt
-	
+
 	echo -e "\n${PURPLE}cargo check${RESET}\n"
 	cargo check
 
@@ -292,7 +293,7 @@ release_flow() {
 
 	echo -e "${PURPLE}git merge --no-ff \"${RELEASE_BRANCH}\" -m \"chore: merge ${RELEASE_BRANCH} into main\"${RESET}"
 	git merge --no-ff "$RELEASE_BRANCH" -m "chore: merge ${RELEASE_BRANCH} into main"
-	
+
 	echo -e "\n${PURPLE}cargo check${RESET}\n"
 	cargo check
 

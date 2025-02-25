@@ -1,5 +1,5 @@
 use crate::S;
-use crate::{app_error::AppError, CliArg};
+use crate::{CliArg, app_error::AppError};
 use std::{env, fs, io::Write, path::Path, process::Command};
 
 const SYSTEMCTL: &str = "systemctl";

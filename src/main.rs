@@ -94,7 +94,7 @@ async fn run_as_client() -> Result<(), AppError> {
 }
 
 async fn start() -> Result<(), AppError> {
-    sysinfo::SysInfo::set_wayland_env();
+    // sysinfo::SysInfo::set_wayland_env();
     if let Some(arg) = parse_arg(std::env::args()) {
         match arg {
             CliArg::Install | CliArg::Uninstall => {

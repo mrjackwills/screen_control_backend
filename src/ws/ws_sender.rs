@@ -1,11 +1,11 @@
-use futures_util::lock::Mutex;
 use futures_util::SinkExt;
+use futures_util::lock::Mutex;
 use std::{process, sync::Arc, time::Instant};
 
 use crate::sysinfo::SysInfo;
 use crate::ws_messages::{MessageValues, ParsedMessage, PiStatus, Response, StructuredResponse};
-use crate::{app_env::AppEnv, ws_messages::to_struct};
 use crate::{C, S};
+use crate::{app_env::AppEnv, ws_messages::to_struct};
 
 use super::WSWriter;
 

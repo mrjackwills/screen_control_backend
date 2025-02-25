@@ -4,7 +4,7 @@ use local_ip_address::local_ip;
 use serde::{Deserialize, Serialize};
 use tokio::fs::read_to_string;
 
-use crate::{app_env::AppEnv, app_error::AppError, ws_messages::ScreenStatus, S};
+use crate::{S, app_env::AppEnv, app_error::AppError, ws_messages::ScreenStatus};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SysInfo {
@@ -19,17 +19,19 @@ const WLR: &str = "/usr/bin/wlr-randr";
 const WLR_ARGS: [&str; 2] = ["--output", "HDMI-A-2"];
 const ON: &str = "--on";
 const OFF: &str = "--off";
-const XDG_KEY: &str = "XDG_RUNTIME_DIR";
-const XDG_VAL: &str = "/run/user/1000";
-const WAY_KEY: &str = "WAYLAND_DISPLAY";
-const WAY_VAL: &str = "wayland-1";
+// const XDG_KEY: &str = "XDG_RUNTIME_DIR";
+// const XDG_VAL: &str = "/run/user/1000";
+// const WAY_KEY: &str = "WAYLAND_DISPLAY";
+// const WAY_VAL: &str = "wayland-1";
 
 impl SysInfo {
-    /// Set ENV's needed for waylad screen status/control
-    pub fn set_wayland_env() {
-        std::env::set_var(XDG_KEY, XDG_VAL);
-        std::env::set_var(WAY_KEY, WAY_VAL);
-    }
+    // /// Set ENV's needed for waylad screen status/control
+    // pub fn set_wayland_env() {
+    //     // TODO: Audit that the environment access only happens in single-threaded code.
+    //     unsafe { std::env::set_var(XDG_KEY, XDG_VAL) };
+    //     // TODO: Audit that the environment access only happens in single-threaded code.
+    //     unsafe { std::env::set_var(WAY_KEY, WAY_VAL) };
+    // }
 
     /// (attempt) to turn on the screen
     pub async fn turn_on() -> Result<Output, AppError> {

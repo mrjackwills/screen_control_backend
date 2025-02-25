@@ -1,10 +1,13 @@
+# <a href='https://github.com/mrjackwills/screen_control_backend/releases/tag/v0.1.0'>v0.1.0</a>
+### 2025-02-25
+
 ### Chores
-+ create_release.sh updated, [23703c93327afd6981f47cc3e4348575619ddd75]
-+ .devcontainer updated, [5a866caa95cba5745a82e3f59bd0d0e0d47e6ba7]
-+ dependencies updated & removed, [2462543e1f0d2aaf2d1d2217ebe54bebe73f9224]
++ create_release.sh updated, [23703c93](https://github.com/mrjackwills/screen_control_backend/commit/23703c93327afd6981f47cc3e4348575619ddd75)
++ .devcontainer updated, [5a866caa](https://github.com/mrjackwills/screen_control_backend/commit/5a866caa95cba5745a82e3f59bd0d0e0d47e6ba7)
++ dependencies updated & removed, [2462543e](https://github.com/mrjackwills/screen_control_backend/commit/2462543e1f0d2aaf2d1d2217ebe54bebe73f9224)
 
 ### Features
-+ Rust 2024 edition, [f76705aaca5c8dc5721756c20b90007b970c492d]
++ Rust 2024 edition, [f76705aa](https://github.com/mrjackwills/screen_control_backend/commit/f76705aaca5c8dc5721756c20b90007b970c492d)
 
 # <a href='https://github.com/mrjackwills/screen_control_backend/releases/tag/v0.0.5'>v0.0.5</a>
 ### 2025-01-13

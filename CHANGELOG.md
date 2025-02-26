@@ -1,3 +1,6 @@
+#### Features
++ use a heartbeat for screen on & off, set env's in systemd unit file, [1e8befb8b54991155fd4f41ea0571a959dcfb1c0]
+
 # <a href='https://github.com/mrjackwills/screen_control_backend/releases/tag/v0.1.0'>v0.1.0</a>
 ### 2025-02-25
 

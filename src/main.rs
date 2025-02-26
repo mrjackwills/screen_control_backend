@@ -108,7 +108,6 @@ async fn run_as_client() -> Result<(), AppError> {
     Ok(())
 }
 
-// todo!("read and env with on and off time, and use that to turnthe screen on and off rather than a cronjob";)
 // if want to change, need to reload service?
 async fn start() -> Result<(), AppError> {
     if let Some(arg) = parse_arg(std::env::args()) {

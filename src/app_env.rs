@@ -1,5 +1,7 @@
 use std::{collections::HashMap, env, time::SystemTime};
 
+use jiff::civil::Time;
+
 use crate::app_error::AppError;
 
 type EnvHashMap = HashMap<String, String>;
@@ -11,6 +13,8 @@ pub struct AppEnv {
     pub ws_address: String,
     pub ws_apikey: String,
     pub ws_password: String,
+    pub time_on: Time,
+    pub time_off: Time,
     pub ws_token_address: String,
 }
 
@@ -38,6 +42,28 @@ impl AppEnv {
         }
     }
 
+    fn parse_time(key: &str, map: &EnvHashMap) -> Time {
+        if let Ok(value) = Self::parse_string(key, map) {
+            let hour = value[0..2]
+                .parse::<u8>()
+                .ok()
+                .and_then(|v| i8::try_from(v).ok());
+
+            let minute = value[2..]
+                .parse::<u8>()
+                .ok()
+                .and_then(|v| i8::try_from(v).ok());
+
+            // todo if let chain
+            if let (Some(hour), Some(minute)) = (hour, minute) {
+                if hour < 24 && minute < 59 {
+                    return Time::constant(hour, minute, 0, 0);
+                }
+            }
+        }
+        Time::constant(12, 0, 0, 0)
+    }
+
     /// Load, and parse .env file, return `AppEnv`
     fn generate() -> Result<Self, AppError> {
         let env_map = env::vars()
@@ -47,6 +73,8 @@ impl AppEnv {
         Ok(Self {
             log_level: Self::parse_log(&env_map),
             start_time: SystemTime::now(),
+            time_off: Self::parse_time("TIME_OFF", &env_map),
+            time_on: Self::parse_time("TIME_ON", &env_map),
             ws_address: Self::parse_string("WS_ADDRESS", &env_map)?,
             ws_apikey: Self::parse_string("WS_APIKEY", &env_map)?,
             ws_password: Self::parse_string("WS_PASSWORD", &env_map)?,
@@ -127,6 +155,38 @@ mod tests {
         assert!(!result04);
     }
 
+    #[tokio::test]
+    async fn env_parse_time_ok() {
+        let mut map = HashMap::new();
+        map.insert(S!("TIME_ON"), S!("0713"));
+        map.insert(S!("TIME_OFF"), S!("2245"));
+
+        let result = AppEnv::parse_time("TIME_ON", &map);
+        assert_eq!(result, Time::constant(7, 13, 0, 0));
+
+        let result = AppEnv::parse_time("TIME_OFF", &map);
+        assert_eq!(result, Time::constant(22, 45, 0, 0));
+    }
+    #[tokio::test]
+    async fn env_parse_time_err() {
+        let mut map = HashMap::new();
+        map.insert(S!("TIME_ON"), S!("0765"));
+        map.insert(S!("TIME_OFF"), S!("2600"));
+
+        let result = AppEnv::parse_time("TIME_ON", &map);
+        assert_eq!(result, Time::constant(12, 0, 0, 0));
+
+        let result = AppEnv::parse_time("TIME_OFF", &map);
+        assert_eq!(result, Time::constant(12, 0, 0, 0));
+
+        let map = HashMap::new();
+
+        let result = AppEnv::parse_time("TIME_ON", &map);
+        assert_eq!(result, Time::constant(12, 0, 0, 0));
+
+        let result = AppEnv::parse_time("TIME_OFF", &map);
+        assert_eq!(result, Time::constant(12, 0, 0, 0));
+    }
     #[test]
     fn env_parse_log_valid() {
         let map = HashMap::from([(S!("RANDOM_STRING"), S!("123"))]);

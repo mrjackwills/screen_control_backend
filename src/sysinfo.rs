@@ -9,30 +9,20 @@ use crate::{S, app_env::AppEnv, app_error::AppError, ws_messages::ScreenStatus};
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SysInfo {
     pub ip_address: String,
+    pub screen_status: Option<ScreenStatus>,
+    pub time_off: (i8, i8),
+    pub time_on: (i8, i8),
+    pub uptime_app: u64,
     pub uptime: usize,
     pub version: String,
-    pub uptime_app: u64,
-    pub screen_status: Option<ScreenStatus>,
 }
 
 const WLR: &str = "/usr/bin/wlr-randr";
 const WLR_ARGS: [&str; 2] = ["--output", "HDMI-A-2"];
 const ON: &str = "--on";
 const OFF: &str = "--off";
-// const XDG_KEY: &str = "XDG_RUNTIME_DIR";
-// const XDG_VAL: &str = "/run/user/1000";
-// const WAY_KEY: &str = "WAYLAND_DISPLAY";
-// const WAY_VAL: &str = "wayland-1";
 
 impl SysInfo {
-    // /// Set ENV's needed for waylad screen status/control
-    // pub fn set_wayland_env() {
-    //     // TODO: Audit that the environment access only happens in single-threaded code.
-    //     unsafe { std::env::set_var(XDG_KEY, XDG_VAL) };
-    //     // TODO: Audit that the environment access only happens in single-threaded code.
-    //     unsafe { std::env::set_var(WAY_KEY, WAY_VAL) };
-    // }
-
     /// (attempt) to turn on the screen
     pub async fn turn_on() -> Result<Output, AppError> {
         tokio::process::Command::new(WLR)
@@ -96,6 +86,8 @@ impl SysInfo {
                 .duration_since(app_envs.start_time)
                 .map_or(0, |value| value.as_secs()),
             screen_status: Self::screen_status().await,
+            time_on: (app_envs.time_on.hour(), app_envs.time_on.minute()),
+            time_off: (app_envs.time_off.hour(), app_envs.time_off.minute()),
             version: S!(env!("CARGO_PKG_VERSION")),
         }
     }

@@ -1,3 +1,4 @@
+use heartbeat::HeartBeat;
 use mimalloc::MiMalloc;
 
 #[global_allocator]
@@ -5,6 +6,7 @@ static GLOBAL: MiMalloc = MiMalloc;
 
 mod app_env;
 mod app_error;
+mod heartbeat;
 mod sysinfo;
 mod systemd;
 mod ws;
@@ -26,6 +28,18 @@ macro_rules! S {
     };
     ($s:expr) => {
         String::from($s)
+    };
+}
+
+#[macro_export]
+/// Sleep for a given number of milliseconds, is an async fn.
+/// If no parameter supplied, defaults to 1000ms
+macro_rules! sleep {
+    () => {
+        tokio::time::sleep(std::time::Duration::from_millis(1000)).await
+    };
+    ($ms:expr) => {
+        tokio::time::sleep(std::time::Duration::from_millis($ms)).await
     };
 }
 
@@ -89,12 +103,13 @@ async fn run_as_client() -> Result<(), AppError> {
     let app_envs = AppEnv::get();
     setup_tracing(Some(&app_envs));
     close_signal();
+    HeartBeat::start(&app_envs);
     open_connection(app_envs).await?;
     Ok(())
 }
 
+// if want to change, need to reload service?
 async fn start() -> Result<(), AppError> {
-    // sysinfo::SysInfo::set_wayland_env();
     if let Some(arg) = parse_arg(std::env::args()) {
         match arg {
             CliArg::Install | CliArg::Uninstall => {
@@ -133,6 +148,8 @@ async fn main() -> Result<(), AppError> {
 mod tests {
     use std::time::SystemTime;
 
+    use jiff::civil::Time;
+
     use crate::app_env::AppEnv;
 
     pub fn test_setup() -> AppEnv {
@@ -142,19 +159,9 @@ mod tests {
             ws_address: S!("ws_address"),
             ws_apikey: S!("ws_apikey"),
             ws_password: S!("ws_password"),
+            time_on: Time::constant(8, 0, 0, 0),
+            time_off: Time::constant(9, 0, 0, 0),
             ws_token_address: S!("ws_token_address"),
         }
-    }
-
-    #[macro_export]
-    /// Sleep for a given number of milliseconds, is an async fn.
-    /// If no parameter supplied, defaults to 1000ms
-    macro_rules! sleep {
-        () => {
-            tokio::time::sleep(std::time::Duration::from_millis(1000)).await;
-        };
-        ($ms:expr) => {
-            tokio::time::sleep(std::time::Duration::from_millis($ms)).await;
-        };
     }
 }

@@ -8,12 +8,14 @@ use super::ScreenStatus;
 /// Basic pi info
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct PiStatus {
+    pub ip_address: String,
     pub screen_status: Option<ScreenStatus>,
+    pub time_off: (i8, i8),
+    pub time_on: (i8, i8),
     pub uptime_app: u64,
     pub uptime_ws: u64,
     pub uptime: usize,
     pub version: String,
-    pub ip_address: String,
 }
 /// Combined pi into and current set alarms
 impl PiStatus {
@@ -21,6 +23,8 @@ impl PiStatus {
         Self {
             ip_address: sysinfo.ip_address,
             screen_status: sysinfo.screen_status,
+            time_off: sysinfo.time_off,
+            time_on: sysinfo.time_on,
             uptime_app: sysinfo.uptime_app,
             uptime: sysinfo.uptime,
             uptime_ws,

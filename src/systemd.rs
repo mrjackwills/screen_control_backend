@@ -62,24 +62,26 @@ fn get_dot_service() -> String {
 fn create_service_file(user_name: &str) -> Result<String, AppError> {
     let current_dir = env::current_dir()?.display().to_string();
     Ok(format!(
-        "[Unit]
-Description={APP_NAME}
-After=network-online.target
-Wants=network-online.target
-StartLimitIntervalSec=0
+        r#"[Unit]
+    Description={APP_NAME}
+    After=network-online.target
+    Wants=network-online.target
+    StartLimitIntervalSec=0
+    
+    [Service]
+    Environment="XDG_RUNTIME_DIR=/run/user/1000"
+    Environment="WAYLAND_DISPLAY=wayland-1"
+    ExecStart={current_dir}/{APP_NAME}
+    WorkingDirectory={current_dir}
+    SyslogIdentifier={APP_NAME}
+    User={user_name}
+    Group={user_name}
+    Restart=always
+    RestartSec=5
 
-[Service]
-ExecStart={current_dir}/{APP_NAME}
-WorkingDirectory={current_dir}
-SyslogIdentifier={APP_NAME}
-User={user_name}
-Group={user_name}
-Restart=always
-RestartSec=5
-
-[Install]
-WantedBy=multi-user.target
-"
+    [Install]
+    WantedBy=multi-user.target
+"#
     ))
 }
 /// If is sudo, and able to get a user name (which isn't root), install leafcast as a service

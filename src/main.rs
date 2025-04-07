@@ -1,4 +1,3 @@
-use heartbeat::HeartBeat;
 use mimalloc::MiMalloc;
 
 #[global_allocator]
@@ -12,10 +11,10 @@ mod systemd;
 mod ws;
 mod ws_messages;
 
-use std::env::Args;
-
 use app_env::AppEnv;
 use app_error::AppError;
+use heartbeat::HeartBeat;
+use std::env::Args;
 use sysinfo::SysInfo;
 use systemd::configure_systemd;
 use ws::open_connection;

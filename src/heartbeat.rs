@@ -5,39 +5,30 @@ pub struct HeartBeat;
 
 impl HeartBeat {
     pub fn start(app_env: &AppEnv) {
-        let on = app_env.time_on;
-        let off = app_env.time_off;
+        let time_on = app_env.time_on;
+        let time_off = app_env.time_off;
         tokio::spawn(async move {
-            Self::spawn(on, off).await;
+            Self::spawn(time_on, time_off).await;
         });
     }
 
     async fn spawn(on: Time, off: Time) {
-        let mut status = false;
         loop {
             let current_time = Zoned::now();
-            if !status
-                && current_time.hour() == on.hour()
+            if current_time.hour() == on.hour()
                 && current_time.minute() == on.minute()
                 && current_time.second() == 0
             {
-                match SysInfo::turn_on().await {
-                    Ok(_) => {
-                        status = true;
-                    }
-                    Err(e) => tracing::error!("{e:}"),
+                if let Err(e) = SysInfo::turn_on().await {
+                    tracing::error!("{e:}");
                 }
             }
-            if status
-                && current_time.hour() == off.hour()
+            if current_time.hour() == off.hour()
                 && current_time.minute() == off.minute()
                 && current_time.second() == 0
             {
-                match SysInfo::turn_off().await {
-                    Ok(_) => {
-                        status = false;
-                    }
-                    Err(e) => tracing::error!("{e:}"),
+                if let Err(e) = SysInfo::turn_off().await {
+                    tracing::error!("{e:}");
                 }
             }
             sleep!(250);

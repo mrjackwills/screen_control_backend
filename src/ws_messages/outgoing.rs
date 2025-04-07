@@ -1,3 +1,4 @@
+// use jiff::Zoned;
 use serde::{Deserialize, Serialize};
 use tokio_tungstenite::tungstenite::Message;
 
@@ -12,6 +13,8 @@ pub struct PiStatus {
     pub screen_status: Option<ScreenStatus>,
     pub time_off: (i8, i8),
     pub time_on: (i8, i8),
+    // todo
+    // pub timestamp_ms: i64
     pub uptime_app: u64,
     pub uptime_ws: u64,
     pub uptime: usize,
@@ -20,6 +23,7 @@ pub struct PiStatus {
 /// Combined pi into and current set alarms
 impl PiStatus {
     pub fn new(sysinfo: SysInfo, uptime_ws: u64) -> Self {
+        // let p = Zoned::now().timestamp().as_second()
         Self {
             ip_address: sysinfo.ip_address,
             screen_status: sysinfo.screen_status,

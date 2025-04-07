@@ -30,7 +30,7 @@ impl AutoClose {
     fn init(&mut self, ws_sender: &WSSender) {
         if let Some(handle) = self.0.as_ref() {
             handle.abort();
-        };
+        }
         let ws_sender = C!(ws_sender);
         self.0 = Some(tokio::spawn(async move {
             tokio::time::sleep(AUTO_CLOSE_TIME).await;
@@ -57,7 +57,7 @@ async fn incoming_ws_message(mut reader: WSReader, ws_sender: WSSender) {
                 break;
             }
             _ => (),
-        };
+        }
     }
     tracing::info!("incoming_ws_message done");
 }

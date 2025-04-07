@@ -1,10 +1,15 @@
+use mimalloc::MiMalloc;
+
+#[global_allocator]
+static GLOBAL: MiMalloc = MiMalloc;
+
 mod app_env;
 mod app_error;
 mod heartbeat;
 mod sysinfo;
 mod systemd;
-mod ws_messages;
 mod ws;
+mod ws_messages;
 
 use app_env::AppEnv;
 use app_error::AppError;

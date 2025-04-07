@@ -24,7 +24,7 @@ dotenvy = "0.15"
 futures-util = "0.3"
 jiff = "0.2"
 local-ip-address = "0.6"
-# mimalloc = "0.1"
+mimalloc = "0.1"
 reqwest = { version = "0.12", default-features = false, features = [
 	"brotli",
 	"gzip",

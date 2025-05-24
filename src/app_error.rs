@@ -10,8 +10,8 @@ pub enum AppError {
     MissingEnv(String),
     #[error("Reqwest Error")]
     Reqwest(#[from] reqwest::Error),
-    #[error("Internal Database Error: {0}")]
-    TungsteniteConnect(#[from] tokio_tungstenite::tungstenite::Error),
+    #[error("WS Connect: {0}")]
+    TungsteniteConnect(String),
     #[error("Invalid WS Status Code")]
     WsStatus,
 }

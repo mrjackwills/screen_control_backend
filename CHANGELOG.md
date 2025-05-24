@@ -1,3 +1,11 @@
+# <a href='https://github.com/mrjackwills/screen_control_backend/releases/tag/v0.1.3'>v0.1.3</a>
+### 2025-05-24
+
+### Chores
++ dependencies updated, [e96869f6](https://github.com/mrjackwills/screen_control_backend/commit/e96869f6cbae5088f80388fa041778776a9070dc)
++ Rust 1.87.0 linting, [60a9a620](https://github.com/mrjackwills/screen_control_backend/commit/60a9a6209243c73a5559608550d58437662b218b)
++ .devcontainer updated, [127c8ca4](https://github.com/mrjackwills/screen_control_backend/commit/127c8ca41e27c9e766ae425943e6e16351b6b02f)
+
 # <a href='https://github.com/mrjackwills/screen_control_backend/releases/tag/v0.1.2'>v0.1.2</a>
 ### 2025-04-07
 

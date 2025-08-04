@@ -143,6 +143,8 @@ async fn main() -> Result<(), AppError> {
     Ok(())
 }
 
+// check the status of the screen power
+
 #[cfg(test)]
 mod tests {
     use std::time::SystemTime;

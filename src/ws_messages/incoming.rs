@@ -12,6 +12,16 @@ pub enum ScreenStatus {
     Off,
 }
 
+impl ScreenStatus {
+    /// Used in the toggle screen command
+    pub const fn get_arg_value(&self) -> &'static str {
+        match self {
+            Self::Off => "1",
+            Self::On => "0",
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "snake_case", tag = "name", content = "body")]
 pub enum ParsedMessage {

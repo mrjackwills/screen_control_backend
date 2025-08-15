@@ -18,19 +18,15 @@ impl HeartBeat {
             if current_time.hour() == on.hour()
                 && current_time.minute() == on.minute()
                 && current_time.second() == 0
-            {
-                if let Err(e) = SysInfo::turn_on().await {
+                && let Err(e) = SysInfo::turn_on().await {
                     tracing::error!("{e:}");
                 }
-            }
             if current_time.hour() == off.hour()
                 && current_time.minute() == off.minute()
                 && current_time.second() == 0
-            {
-                if let Err(e) = SysInfo::turn_off().await {
+                && let Err(e) = SysInfo::turn_off().await {
                     tracing::error!("{e:}");
                 }
-            }
             sleep!(250);
         }
     }

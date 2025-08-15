@@ -4,7 +4,7 @@ use std::{process, sync::Arc, time::Instant};
 
 use crate::sysinfo::SysInfo;
 use crate::ws_messages::{MessageValues, ParsedMessage, PiStatus, Response, StructuredResponse};
-use crate::{C, S};
+use crate::{C, S, sleep};
 use crate::{app_env::AppEnv, ws_messages::to_struct};
 
 use super::WSWriter;
@@ -51,6 +51,8 @@ impl WSSender {
                                 tracing::error!("{e}");
                                 self.send_error("Unable to turn ON screen").await;
                             }
+                            // sleep here so that the screen status can get updated
+                            sleep!(250);
                         }
                     }
                     self.send_status().await;

@@ -25,11 +25,10 @@ pub struct SysInfo {
 impl SysInfo {
     /// Check the screen status, maybe put this value in an .env, as it can change depending which por
     pub async fn screen_status() -> Option<ScreenStatus> {
-        let uptime = read_to_string("/sys/class/drm/card1-HDMI-A-1/enabled")
+        let status = read_to_string("/sys/class/drm/card1-HDMI-A-1/enabled")
             .await
             .unwrap_or_default();
-
-        match uptime.trim() {
+        match status.trim() {
             "enabled" => Some(ScreenStatus::On),
             "disabled" => Some(ScreenStatus::Off),
             _ => None,

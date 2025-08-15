@@ -5,7 +5,6 @@ edition = "2024"
 authors = ["Jack Wills <email@mrjackwills.com>"]
 description = "Toggle the screen power"
 
-
 [lints.rust]
 unsafe_code = "forbid"
 

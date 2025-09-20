@@ -109,7 +109,7 @@ impl SysInfo {
     /// Generate sysinfo struct, will valid data
     pub async fn new(app_envs: &AppEnv) -> Self {
         Self {
-            ip_address: local_ip().map_or(S!("UNKNOWN"), |i| i.to_string()),
+            ip_address: local_ip().map_or_else(|_|S!("UNKNOWN"), |i| i.to_string()),
             uptime: Self::get_uptime().await,
             uptime_app: std::time::SystemTime::now()
                 .duration_since(app_envs.start_time)

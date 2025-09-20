@@ -17,21 +17,25 @@ pub struct SysInfo {
     pub version: String,
 }
 
-// const WLR: &str = "/usr/bin/wlr-randr";
-// const WLR_ARGS: [&str; 2] = ["--output", "HDMI-A-2"];
-// const ON: &str = "--on";
-// const OFF: &str = "--off";
-
 impl SysInfo {
     /// Check the screen status, maybe put this value in an .env, as it can change depending which por
     pub async fn screen_status() -> Option<ScreenStatus> {
-        let status = read_to_string("/sys/class/drm/card1-HDMI-A-1/enabled")
-            .await
-            .unwrap_or_default();
-        match status.trim() {
-            "enabled" => Some(ScreenStatus::On),
-            "disabled" => Some(ScreenStatus::Off),
-            _ => None,
+        let get = |num: u8| async move {
+            read_to_string(format!("/sys/class/drm/card1-HDMI-A-{num}/enabled"))
+                .await
+                .unwrap_or_default()
+                .trim()
+                .to_owned()
+        };
+
+        let status = [get(1).await, get(2).await];
+
+        if status.contains(&"enabled".into()) {
+            Some(ScreenStatus::On)
+        } else if status.contains(&"disabled".into()) {
+            Some(ScreenStatus::Off)
+        } else {
+            None
         }
     }
 
@@ -62,43 +66,6 @@ impl SysInfo {
         Self::toggle_screen(ScreenStatus::Off).await
     }
 
-    // (attempt) to turn on the screen
-    // pub async fn turn_on() -> Result<Output, AppError> {
-    //     tokio::process::Command::new(WLR)
-    //         .args(WLR_ARGS)
-    //         .arg(ON)
-    //         .output()
-    //         .await
-    //         .map_err(AppError::Io)
-    // }
-
-    // /// Convert from wlr-randr to an Option<ScreenStatus>
-    // fn extract_enabled_line(input: &str) -> Option<ScreenStatus> {
-    //     input
-    //         .lines()
-    //         .find(|line| line.trim().starts_with("Enabled:"))
-    //         .map(|x| {
-    //             if x.trim().ends_with("no") {
-    //                 ScreenStatus::Off
-    //             } else {
-    //                 ScreenStatus::On
-    //             }
-    //         })
-    // }
-
-    // /// Get the screen status
-    // pub async fn screen_status() -> Option<ScreenStatus> {
-    //     Self::extract_enabled_line(
-    //         &tokio::process::Command::new(WLR)
-    //             .args(WLR_ARGS)
-    //             .output()
-    //             .await
-    //             .map_or(String::new(), |i| {
-    //                 String::from_utf8(i.stdout).unwrap_or_default()
-    //             }),
-    //     )
-    // }
-
     /// Get uptime by reading, and parsing, /proc/uptime file
     async fn get_uptime() -> usize {
         let uptime = read_to_string("/proc/uptime").await.unwrap_or_default();
@@ -109,7 +76,7 @@ impl SysInfo {
     /// Generate sysinfo struct, will valid data
     pub async fn new(app_envs: &AppEnv) -> Self {
         Self {
-            ip_address: local_ip().map_or_else(|_|S!("UNKNOWN"), |i| i.to_string()),
+            ip_address: local_ip().map_or_else(|_| S!("UNKNOWN"), |i| i.to_string()),
             uptime: Self::get_uptime().await,
             uptime_app: std::time::SystemTime::now()
                 .duration_since(app_envs.start_time)
@@ -151,88 +118,4 @@ mod tests {
         // Again assume ones computer has been turned on for one minute
         assert!(result.uptime > 60);
     }
-
-    // #[tokio::test]
-    // async fn test_extract_enabled_line() {
-    //     let off = r#"Command output: HDMI-A-2 "NewTek JOYSX 0000000000001 (HDMI-A-2)"
-    //     Physical size: 480x270 mm
-    //     Enabled: no
-    //     Modes:
-    //       720x400 px, 70.082001 Hz
-    //       640x480 px, 59.939999 Hz
-    //       640x480 px, 59.939999 Hz
-    //       640x480 px, 60.000000 Hz
-    //       640x480 px, 66.667000 Hz
-    //       640x480 px, 72.808998 Hz
-    //       640x480 px, 75.000000 Hz
-    //       720x480 px, 59.939999 Hz
-    //       720x480 px, 60.000000 Hz
-    //       720x576 px, 50.000000 Hz
-    //       800x600 px, 56.250000 Hz
-    //       800x600 px, 60.317001 Hz
-    //       800x600 px, 72.188004 Hz
-    //       800x600 px, 75.000000 Hz
-    //       832x624 px, 74.551003 Hz
-    //       1024x768 px, 60.004002 Hz
-    //       1024x768 px, 70.069000 Hz
-    //       1024x768 px, 75.028999 Hz
-    //       1280x720 px, 50.000000 Hz
-    //       1280x720 px, 59.939999 Hz
-    //       1280x720 px, 60.000000 Hz
-    //       1280x720 px, 60.000000 Hz
-    //       1366x768 px, 60.009998 Hz
-    //       1280x960 px, 60.000000 Hz
-    //       1440x900 px, 59.901001 Hz
-    //       1280x1024 px, 60.020000 Hz
-    //       1280x1024 px, 75.025002 Hz
-    //       1680x1050 px, 59.882999 Hz
-    //       1920x1080 px, 60.000000 Hz
-    //       1024x600 px, 59.993000 Hz (preferred)"#;
-
-    //     let result = SysInfo::extract_enabled_line(off);
-    //     assert!(result.is_some());
-    //     assert_eq!(result, Some(ScreenStatus::Off));
-
-    //     let on = r#"Command output: HDMI-A-2 "NewTek JOYSX 0000000000001 (HDMI-A-2)"
-    //     Physical size: 480x270 mm
-    //     Enabled: yes
-    //     Modes:
-    //       720x400 px, 70.082001 Hz
-    //       640x480 px, 59.939999 Hz
-    //       640x480 px, 59.939999 Hz
-    //       640x480 px, 60.000000 Hz
-    //       640x480 px, 66.667000 Hz
-    //       640x480 px, 72.808998 Hz
-    //       640x480 px, 75.000000 Hz
-    //       720x480 px, 59.939999 Hz
-    //       720x480 px, 60.000000 Hz
-    //       720x576 px, 50.000000 Hz
-    //       800x600 px, 56.250000 Hz
-    //       800x600 px, 60.317001 Hz
-    //       800x600 px, 72.188004 Hz
-    //       800x600 px, 75.000000 Hz
-    //       832x624 px, 74.551003 Hz
-    //       1024x768 px, 60.004002 Hz
-    //       1024x768 px, 70.069000 Hz
-    //       1024x768 px, 75.028999 Hz
-    //       1280x720 px, 50.000000 Hz
-    //       1280x720 px, 59.939999 Hz
-    //       1280x720 px, 60.000000 Hz
-    //       1280x720 px, 60.000000 Hz
-    //       1366x768 px, 60.009998 Hz
-    //       1280x960 px, 60.000000 Hz
-    //       1440x900 px, 59.901001 Hz
-    //       1280x1024 px, 60.020000 Hz
-    //       1280x1024 px, 75.025002 Hz
-    //       1680x1050 px, 59.882999 Hz
-    //       1920x1080 px, 60.000000 Hz
-    //       1024x600 px, 59.993000 Hz (preferred)"#;
-
-    //     let result = SysInfo::extract_enabled_line(on);
-    //     assert!(result.is_some());
-    //     assert_eq!(result, Some(ScreenStatus::On));
-
-    //     let result = SysInfo::extract_enabled_line("error with some random text");
-    //     assert!(result.is_none());
-    // }
 }

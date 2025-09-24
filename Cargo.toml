@@ -1,9 +1,10 @@
 [package]
 name = "screen_control"
-version = "0.1.4"
+version = "0.1.5"
 edition = "2024"
 authors = ["Jack Wills <email@mrjackwills.com>"]
 description = "Toggle the screen power"
+rust-version = "1.90.0"
 
 [lints.rust]
 unsafe_code = "forbid"

@@ -3,7 +3,7 @@
 + dependencies updated, [09233e83b11f78c91cbfe9d9d4ae025cd97a461f]
 
 ### Features
-+ spawn immediatley in main(), [9395cd208316b78a8129a1a7536ea110658b816d]
++ spawn immediately in main(), [9395cd208316b78a8129a1a7536ea110658b816d]
 + use CancelationToken, [d794a6fdfd928a4ff63e6420c9ce6ca9faaae0b3]
 
 # <a href='https://github.com/mrjackwills/screen_control_backend/releases/tag/v0.1.5'>v0.1.5</a>

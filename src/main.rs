@@ -103,8 +103,7 @@ async fn run_as_client() -> Result<(), AppError> {
     setup_tracing(Some(&app_envs));
     close_signal();
     HeartBeat::start(&app_envs);
-    open_connection(app_envs).await?;
-    Ok(())
+    open_connection(app_envs).await
 }
 
 // if want to change, need to reload service?
@@ -138,9 +137,14 @@ async fn start() -> Result<(), AppError> {
 }
 
 #[tokio::main]
-async fn main() -> Result<(), AppError> {
-    tokio::spawn(start()).await.ok();
-    Ok(())
+async fn main() {
+    tokio::spawn(async move {
+        if let Err(e) = start().await {
+            tracing::error!("{e}");
+        }
+    })
+    .await
+    .ok();
 }
 
 // check the status of the screen power

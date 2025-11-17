@@ -36,8 +36,9 @@ serde_json = "1.0"
 simple-signal = "1.1"
 sudo = "0.6"
 thiserror = "2.0"
-tokio = { version = "1.47", features = ["full"] }
-tokio-tungstenite = { version = "0.27", features = ["rustls-tls-native-roots"] }
+tokio = { version = "1.48", features = ["full"] }
+tokio-tungstenite = { version = "0.28", features = ["rustls-tls-native-roots"] }
+tokio-util = "0.7.17"
 tracing = "0.1"
 tracing-subscriber = "0.3"
 

@@ -9,8 +9,9 @@ use futures_util::{
     stream::{SplitSink, SplitStream},
 };
 use std::{sync::Arc, time::Duration};
-use tokio::{net::TcpStream, task::JoinHandle};
+use tokio::net::TcpStream;
 use tokio_tungstenite::{self, MaybeTlsStream, WebSocketStream, tungstenite::Message};
+use tokio_util::sync::CancellationToken;
 
 use crate::{C, app_env::AppEnv, app_error::AppError, ws::ws_sender::WSSender};
 
@@ -23,19 +24,23 @@ mod ws_sender;
 const AUTO_CLOSE_TIME: Duration = std::time::Duration::from_secs(40);
 
 #[derive(Debug, Default)]
-struct AutoClose(Option<JoinHandle<()>>);
+struct AutoClose(CancellationToken);
 
 /// Will close the connection after 40 seconds unless a ping message is received
 impl AutoClose {
     fn init(&mut self, ws_sender: &WSSender) {
-        if let Some(handle) = self.0.as_ref() {
-            handle.abort();
-        }
+        self.0.cancel();
+        self.0 = CancellationToken::new();
+        let token = self.0.clone();
         let ws_sender = C!(ws_sender);
-        self.0 = Some(tokio::spawn(async move {
-            tokio::time::sleep(AUTO_CLOSE_TIME).await;
-            ws_sender.close().await;
-        }));
+        tokio::spawn(async move {
+            token
+                .run_until_cancelled(async {
+                    tokio::time::sleep(AUTO_CLOSE_TIME).await;
+                    ws_sender.close().await;
+                })
+                .await;
+        });
     }
 }
 

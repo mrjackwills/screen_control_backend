@@ -5,6 +5,7 @@
 ### Features
 + spawn immediately in main(), [9395cd208316b78a8129a1a7536ea110658b816d]
 + use CancelationToken, [d794a6fdfd928a4ff63e6420c9ce6ca9faaae0b3]
++ use async_channel instead of arc mutexes, [d8ac1cd960bc412ead98985055f20add5c4f9558]
 
 # <a href='https://github.com/mrjackwills/screen_control_backend/releases/tag/v0.1.5'>v0.1.5</a>
 ### 2025-09-24

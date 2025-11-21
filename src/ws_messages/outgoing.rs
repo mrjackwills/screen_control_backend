@@ -1,5 +1,4 @@
 use jiff::Zoned;
-// use jiff::Zoned;
 use serde::{Deserialize, Serialize};
 use tokio_tungstenite::tungstenite::Message;
 
@@ -52,17 +51,14 @@ pub struct StructuredResponse {
     data: Option<Response>,
     #[serde(skip_serializing_if = "Option::is_none")]
     error: Option<Response>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    unique: Option<String>,
 }
 
 impl StructuredResponse {
     /// Convert a ResponseMessage into a Tokio message of StructureResponse
-    pub fn data(data: Response, unique: Option<String>) -> Message {
+    pub fn data(data: Response) -> Message {
         let x = Self {
             data: Some(data),
             error: None,
-            unique,
         };
         Message::Text(serde_json::to_string(&x).unwrap_or_default().into())
     }
@@ -72,7 +68,6 @@ impl StructuredResponse {
         let x = Self {
             error: Some(data),
             data: None,
-            unique: None,
         };
         Message::Text(serde_json::to_string(&x).unwrap_or_default().into())
     }

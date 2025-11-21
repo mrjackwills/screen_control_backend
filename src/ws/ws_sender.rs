@@ -1,104 +1,67 @@
-use futures_util::SinkExt;
-use futures_util::lock::Mutex;
-use std::{process, sync::Arc, time::Instant};
+use async_channel::Sender;
+use std::{process, time::Instant};
 
+use crate::C;
+use crate::message_handler::Msg;
 use crate::sysinfo::SysInfo;
-use crate::ws_messages::{MessageValues, ParsedMessage, PiStatus, Response, StructuredResponse};
-use crate::{C, S, sleep};
+use crate::ws_messages::{MessageValues, ParsedMessage, PiStatus, Response};
 use crate::{app_env::AppEnv, ws_messages::to_struct};
-
-use super::WSWriter;
 
 #[derive(Debug, Clone)]
 pub struct WSSender {
     app_envs: AppEnv,
     connected_instant: Instant,
-    writer: Arc<Mutex<WSWriter>>,
-    unique: Option<String>,
+    tx: Sender<Msg>,
 }
 
 impl WSSender {
-    pub fn new(
-        app_envs: &AppEnv,
-        connected_instant: Instant,
-        writer: Arc<Mutex<WSWriter>>,
-    ) -> Self {
+    pub fn new(app_envs: &AppEnv, tx: &Sender<Msg>) -> Self {
         Self {
             app_envs: C!(app_envs),
-            connected_instant,
-            writer,
-            unique: None,
+            connected_instant: std::time::Instant::now(),
+            tx: C!(tx),
         }
     }
 
+    /// Update the connected_instance time
+    pub fn on_connection(&mut self) {
+        self.connected_instant = std::time::Instant::now();
+    }
+
     /// Handle text message, in this program they will all be json text
-    pub async fn on_text(&mut self, message: String) {
+    pub async fn on_text(&self, message: String) {
         if let Some(data) = to_struct(&message) {
             match data {
                 MessageValues::Invalid(error) => tracing::error!("invalid::{error:?}"),
-                MessageValues::Valid(msg, unique) => {
-                    self.unique = Some(unique);
-                    match msg {
-                        ParsedMessage::Status => (),
-                        ParsedMessage::ScreenOff => {
-                            if let Err(e) = SysInfo::turn_off().await {
-                                tracing::error!("{e}");
-                                self.send_error("Unable to turn OFF screen").await;
-                            }
-                        }
-                        ParsedMessage::ScreenOn => {
-                            if let Err(e) = SysInfo::turn_on().await {
-                                tracing::error!("{e}");
-                                self.send_error("Unable to turn ON screen").await;
-                            }
-                            // sleep here so that the screen status can get updated
-                            sleep!(250);
-                        }
+                MessageValues::Valid(message) => match message {
+                    ParsedMessage::ScreenOff => {
+                        self.tx.send(Msg::ScreenOff).await.ok();
                     }
-                    self.send_status().await;
-                }
+                    ParsedMessage::Status => {
+                        self.tx.send(Msg::Status).await.ok();
+                    }
+                    ParsedMessage::ScreenOn => {
+                        self.tx.send(Msg::ScreenOn).await.ok();
+                    }
+                },
             }
         }
     }
 
-    /// Send a message to the socket
-    async fn send_ws_response(&self, response: Response, unique: Option<String>) {
-        match self
-            .writer
-            .lock()
-            .await
-            .send(StructuredResponse::data(response, unique))
-            .await
-        {
-            Ok(()) => tracing::trace!("Message sent"),
+    async fn send_ws_response(&self, response: Response) {
+        match self.tx.send(Msg::ToSend(response)).await {
+            Ok(()) => (),
             Err(e) => {
-                tracing::error!("send_ws_response::SEND-ERROR::{e:?}");
+                tracing::error!("{e}");
                 process::exit(1);
             }
         }
     }
 
-    /// Send a unique error message
-    pub async fn send_error(&self, message: &str) {
-        self.send_ws_response(Response::Error(S!(message)), C!(self.unique))
-            .await;
-    }
-
     /// Generate, and send, pi information
     pub async fn send_status(&self) {
-        let info = SysInfo::new(&self.app_envs).await;
-        let info = PiStatus::new(info, self.connected_instant.elapsed().as_secs());
-        self.send_ws_response(Response::Status(info), None).await;
-    }
-
-    /// close connection, uses a 2 second timeout
-    pub async fn close(&self) {
-        tokio::time::timeout(
-            std::time::Duration::from_secs(2),
-            self.writer.lock().await.close(),
-        )
-        .await
-        .ok()
-        .map(std::result::Result::ok);
+        let sys_info = SysInfo::new(&self.app_envs).await;
+        let pi_info = PiStatus::new(sys_info, self.connected_instant.elapsed().as_secs());
+        self.send_ws_response(Response::Status(pi_info)).await;
     }
 }

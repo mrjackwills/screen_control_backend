@@ -1,5 +1,4 @@
-use super::WsStream;
-use crate::{app_env::AppEnv, app_error::AppError};
+use crate::{app_env::AppEnv, app_error::AppError, message_handler::WsStream};
 use serde::{Deserialize, Serialize};
 use tokio_tungstenite::{self, connect_async, tungstenite::http::StatusCode};
 
@@ -19,7 +18,7 @@ impl<'a> From<&'a AppEnv> for PostRequest<'a> {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-// This is an uuid, but probably no need to parse it as such
+// This is an ULID, but probably no need to parse it as such
 struct PostResponse {
     response: String,
 }

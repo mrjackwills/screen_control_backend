@@ -1,33 +1,31 @@
+use async_channel::Sender;
 use jiff::{Zoned, civil::Time};
 
-use crate::{app_env::AppEnv, sleep, sysinfo::SysInfo};
-pub struct HeartBeat;
+use crate::{C, app_env::AppEnv, message_handler::Msg, sleep};
+pub struct Croner;
 
-impl HeartBeat {
-    pub fn start(app_env: &AppEnv) {
-        let time_on = app_env.time_on;
-        let time_off = app_env.time_off;
+impl Croner {
+    pub fn start(app_env: &AppEnv, tx: &Sender<Msg>) {
+        let (on, off, tx) = (app_env.time_on, app_env.time_off, C!(tx));
         tokio::spawn(async move {
-            Self::spawn(time_on, time_off).await;
+            Self::spawn(on, off, tx).await;
         });
     }
 
-    async fn spawn(on: Time, off: Time) {
+    async fn spawn(on: Time, off: Time, tx: Sender<Msg>) {
         loop {
             let current_time = Zoned::now();
             if current_time.hour() == on.hour()
                 && current_time.minute() == on.minute()
                 && current_time.second() == 0
-                && let Err(e) = SysInfo::turn_on().await
             {
-                tracing::error!("{e:}");
+                tx.send(Msg::ScreenOn).await.ok();
             }
             if current_time.hour() == off.hour()
                 && current_time.minute() == off.minute()
                 && current_time.second() == 0
-                && let Err(e) = SysInfo::turn_off().await
             {
-                tracing::error!("{e:}");
+                tx.send(Msg::ScreenOff).await.ok();
             }
             sleep!(250);
         }

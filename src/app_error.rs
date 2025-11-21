@@ -2,7 +2,7 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum AppError {
-    #[error("IO Error")]
+    #[error("IO Error: '{0}'")]
     Io(#[from] std::io::Error),
     #[error("Internal error: '{0}'")]
     Internal(String),

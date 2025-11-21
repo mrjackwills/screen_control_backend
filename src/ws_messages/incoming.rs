@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug)]
 pub enum MessageValues {
-    Valid(ParsedMessage, String),
+    Valid(ParsedMessage),
     Invalid(ErrorData),
 }
 
@@ -52,7 +52,7 @@ pub fn to_struct(input: &str) -> Option<MessageValues> {
             return Some(MessageValues::Invalid(message));
         }
         if let Some(message) = data.data {
-            return Some(MessageValues::Valid(message, data.unique));
+            return Some(MessageValues::Valid(message));
         }
         None
     } else {
@@ -78,7 +78,7 @@ mod tests {
         let result = to_struct(json);
         assert!(result.is_some());
         match result.unwrap() {
-            MessageValues::Valid(_, _) => (),
+            MessageValues::Valid(_) => (),
             MessageValues::Invalid(_) => unreachable!("this indicates the test has failed"),
         }
     }

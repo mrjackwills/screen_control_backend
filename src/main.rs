@@ -1,3 +1,4 @@
+use async_channel::Sender;
 use mimalloc::MiMalloc;
 
 #[global_allocator]
@@ -5,7 +6,8 @@ static GLOBAL: MiMalloc = MiMalloc;
 
 mod app_env;
 mod app_error;
-mod heartbeat;
+mod cron;
+mod message_handler;
 mod sysinfo;
 mod systemd;
 mod ws;
@@ -13,11 +15,13 @@ mod ws_messages;
 
 use app_env::AppEnv;
 use app_error::AppError;
-use heartbeat::HeartBeat;
+use cron::Croner;
+use simple_signal::Signal;
 use std::env::Args;
 use sysinfo::SysInfo;
 use systemd::configure_systemd;
-use ws::open_connection;
+
+use crate::message_handler::Msg;
 
 /// Simple macro to create a new String, or convert from a &str to  a String - basically just gets rid of String::from() / .to_owned() etc
 #[macro_export]
@@ -50,9 +54,11 @@ macro_rules! C {
     };
 }
 
-fn close_signal() {
-    tokio::spawn(async move {
-        tokio::signal::ctrl_c().await.ok();
+fn close_signal(tx: &Sender<Msg>) {
+    let tx = C!(tx);
+    simple_signal::set_handler(&[Signal::Int, Signal::Term], move |_| {
+        tx.send_blocking(Msg::Exit).ok();
+        std::thread::sleep(std::time::Duration::from_millis(250));
         std::process::exit(1);
     });
 }
@@ -75,15 +81,18 @@ enum CliArg {
 /// display cli argument information
 fn display_arg_info() {
     println!(
-        "\n{} v{}\n",
+        "
+{} v{}
+
+ --on  Turn screen on
+--off  Turn screen off
+   -i  Install systemd service, requires running as SUDO
+   -u  Uninstall systemd service, requires running as SUDO
+   -h  Display this Help section
+",
         env!("CARGO_PKG_NAME"),
         env!("CARGO_PKG_VERSION")
     );
-    println!("--on   Turn screen on");
-    println!("--off  Turn screen off");
-    println!("-i     Install systemd service, requires running as SUDO");
-    println!("-u     Uninstall systemd service, requires running as SUDO");
-    println!("-h     Display this Help section\n");
 }
 /// Parse the command line arguments
 fn parse_arg(args: Args) -> Option<CliArg> {
@@ -101,9 +110,12 @@ fn parse_arg(args: Args) -> Option<CliArg> {
 async fn run_as_client() -> Result<(), AppError> {
     let app_envs = AppEnv::get();
     setup_tracing(Some(&app_envs));
-    close_signal();
-    HeartBeat::start(&app_envs);
-    open_connection(app_envs).await
+    let (tx, rx) = async_channel::bounded(2048);
+    close_signal(&tx);
+    Croner::start(&app_envs, &tx);
+    message_handler::MessageHandler::new(app_envs, rx, tx)
+        .start()
+        .await
 }
 
 // if want to change, need to reload service?

@@ -6,6 +6,8 @@ use tokio::fs::read_to_string;
 
 use crate::{S, app_env::AppEnv, app_error::AppError, ws_messages::ScreenStatus};
 
+/// Using tokio::join_all causes this issue
+#[allow(clippy::unsafe_derive_deserialize)]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SysInfo {
     pub ip_address: String,
@@ -28,8 +30,7 @@ impl SysInfo {
                 .to_owned()
         };
 
-        let status = [get(1).await, get(2).await];
-
+        let status = <[String; 2]>::from(tokio::join!(get(1), get(2)));
         if status.contains(&"enabled".into()) {
             Some(ScreenStatus::On)
         } else if status.contains(&"disabled".into()) {
@@ -59,29 +60,35 @@ impl SysInfo {
             .await
             .map_err(AppError::Io)
     }
+
     pub async fn turn_on() -> Result<Output, AppError> {
         Self::toggle_screen(ScreenStatus::On).await
     }
+
     pub async fn turn_off() -> Result<Output, AppError> {
         Self::toggle_screen(ScreenStatus::Off).await
     }
 
     /// Get uptime by reading, and parsing, /proc/uptime file
     async fn get_uptime() -> usize {
-        let uptime = read_to_string("/proc/uptime").await.unwrap_or_default();
-        let (uptime, _) = uptime.split_once('.').unwrap_or_default();
-        uptime.parse::<usize>().unwrap_or_default()
+        read_to_string("/proc/uptime")
+            .await
+            .unwrap_or_default()
+            .split_once('.')
+            .map(|(i, _)| i.parse::<usize>().unwrap_or_default())
+            .unwrap_or_default()
     }
 
     /// Generate sysinfo struct, will valid data
     pub async fn new(app_envs: &AppEnv) -> Self {
+        let (uptime, screen_status) = tokio::join!(Self::get_uptime(), Self::screen_status());
         Self {
             ip_address: local_ip().map_or_else(|_| S!("UNKNOWN"), |i| i.to_string()),
-            uptime: Self::get_uptime().await,
             uptime_app: std::time::SystemTime::now()
                 .duration_since(app_envs.start_time)
                 .map_or(0, |value| value.as_secs()),
-            screen_status: Self::screen_status().await,
+            screen_status,
+            uptime,
             time_on: (app_envs.time_on.hour(), app_envs.time_on.minute()),
             time_off: (app_envs.time_off.hour(), app_envs.time_off.minute()),
             version: S!(env!("CARGO_PKG_VERSION")),

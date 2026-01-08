@@ -63,9 +63,9 @@ fn close_signal(tx: &Sender<Msg>) {
     });
 }
 
-fn setup_tracing(app_envs: Option<&AppEnv>) {
+fn setup_tracing(app_env: Option<&AppEnv>) {
     tracing_subscriber::fmt()
-        .with_max_level(app_envs.map_or(tracing::Level::DEBUG, |i| i.log_level))
+        .with_max_level(app_env.map_or(tracing::Level::DEBUG, |i| i.log_level))
         .init();
 }
 
@@ -108,12 +108,12 @@ fn parse_arg(args: Args) -> Option<CliArg> {
 
 /// Run the client, connect to WS as long running process
 async fn run_as_client() -> Result<(), AppError> {
-    let app_envs = AppEnv::get();
-    setup_tracing(Some(&app_envs));
+    let app_env = AppEnv::get();
+    setup_tracing(Some(&app_env));
     let (tx, rx) = async_channel::bounded(2048);
     close_signal(&tx);
-    Croner::start(&app_envs, &tx);
-    message_handler::MessageHandler::new(app_envs, rx, tx)
+    Croner::start(&app_env, &tx);
+    message_handler::MessageHandler::new(app_env, rx, tx)
         .start()
         .await
 }

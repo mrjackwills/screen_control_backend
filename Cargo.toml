@@ -1,6 +1,6 @@
 [package]
 name = "screen_control"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2024"
 authors = ["Jack Wills <email@mrjackwills.com>"]
 description = "Toggle the screen power"
@@ -10,8 +10,6 @@ rust-version = "1.90.0"
 unsafe_code = "forbid"
 
 [lints.clippy]
-nursery = { level = "warn", priority = -1 }
-pedantic = { level = "warn", priority = -1 }
 unused_async = "warn"
 unwrap_used = "warn"
 expect_used = "warn"
@@ -26,18 +24,18 @@ futures-util = "0.3"
 jiff = "0.2"
 local-ip-address = "0.6"
 mimalloc = "0.1"
-reqwest = { version = "0.12", default-features = false, features = [
+reqwest = { version = "0.13", default-features = false, features = [
 	"brotli",
 	"gzip",
 	"json",
-	"rustls-tls-native-roots",
+	"default-tls"
 ] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 simple-signal = "1.1"
 sudo = "0.6"
 thiserror = "2.0"
-tokio = { version = "1.48", features = ["full"] }
+tokio = { version = "1.49", features = ["full"] }
 tokio-tungstenite = { version = "0.28", features = ["rustls-tls-native-roots"] }
 tokio-util = "0.7"
 tracing = "0.1"
@@ -49,3 +47,4 @@ codegen-units = 1
 panic = 'abort'
 strip = true
 debug = false
+opt-level = 2

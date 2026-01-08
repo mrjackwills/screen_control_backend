@@ -22,15 +22,15 @@ pub struct SysInfo {
 impl SysInfo {
     /// Check the screen status, maybe put this value in an .env, as it can change depending which por
     pub async fn screen_status() -> Option<ScreenStatus> {
-        let get = |num: u8| async move {
-            read_to_string(format!("/sys/class/drm/card1-HDMI-A-{num}/enabled"))
+        let get = |card: u8, num: u8| async move {
+            read_to_string(format!("/sys/class/drm/card{card}-HDMI-A-{num}/enabled"))
                 .await
                 .unwrap_or_default()
                 .trim()
                 .to_owned()
         };
 
-        let status = <[String; 2]>::from(tokio::join!(get(1), get(2)));
+        let status = <[String; 4]>::from(tokio::join!(get(0, 1), get(0, 2), get(1, 1), get(1, 2)));
         if status.contains(&"enabled".into()) {
             Some(ScreenStatus::On)
         } else if status.contains(&"disabled".into()) {
@@ -80,17 +80,17 @@ impl SysInfo {
     }
 
     /// Generate sysinfo struct, will valid data
-    pub async fn new(app_envs: &AppEnv) -> Self {
+    pub async fn new(app_env: &AppEnv) -> Self {
         let (uptime, screen_status) = tokio::join!(Self::get_uptime(), Self::screen_status());
         Self {
             ip_address: local_ip().map_or_else(|_| S!("UNKNOWN"), |i| i.to_string()),
             uptime_app: std::time::SystemTime::now()
-                .duration_since(app_envs.start_time)
+                .duration_since(app_env.start_time)
                 .map_or(0, |value| value.as_secs()),
             screen_status,
             uptime,
-            time_on: (app_envs.time_on.hour(), app_envs.time_on.minute()),
-            time_off: (app_envs.time_off.hour(), app_envs.time_off.minute()),
+            time_on: (app_env.time_on.hour(), app_env.time_on.minute()),
+            time_off: (app_env.time_off.hour(), app_env.time_off.minute()),
             version: S!(env!("CARGO_PKG_VERSION")),
         }
     }
@@ -115,10 +115,10 @@ mod tests {
 
     #[tokio::test]
     async fn sysinfo_get_sysinfo_ok() {
-        let app_envs = test_setup();
+        let app_env = test_setup();
         sleep!(1000);
 
-        let result = SysInfo::new(&app_envs).await;
+        let result = SysInfo::new(&app_env).await;
 
         assert_eq!(result.version, env!("CARGO_PKG_VERSION"));
         assert_eq!(result.uptime_app, 1);

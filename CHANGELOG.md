@@ -1,7 +1,10 @@
+# <a href='https://github.com/mrjackwills/screen_control_backend/releases/tag/v0.2.1'>v0.2.1</a>
+### 2026-01-08
+
 ### Chores
-+ rename app_envs: app_env, [32fad664f83a2038433d95dc001376d1ac42feb8]
-+ GitHub workflow updated, [eab85023564d6bd5f1be6232ffe3c1e62f507125]
-+ dependencies updated, [84176f7fe6b90a1aad7ee99ec36833acd62eb12f], [320d7b04b6ae371951f037b7f5eafa24915acc9d]
++ rename app_envs: app_env, [32fad664](https://github.com/mrjackwills/screen_control_backend/commit/32fad664f83a2038433d95dc001376d1ac42feb8)
++ GitHub workflow updated, [eab85023](https://github.com/mrjackwills/screen_control_backend/commit/eab85023564d6bd5f1be6232ffe3c1e62f507125)
++ dependencies updated, [84176f7f](https://github.com/mrjackwills/screen_control_backend/commit/84176f7fe6b90a1aad7ee99ec36833acd62eb12f), [320d7b04](https://github.com/mrjackwills/screen_control_backend/commit/320d7b04b6ae371951f037b7f5eafa24915acc9d)
 
 # <a href='https://github.com/mrjackwills/screen_control_backend/releases/tag/v0.2.0'>v0.2.0</a>
 ### 2025-11-21

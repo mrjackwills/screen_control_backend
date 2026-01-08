@@ -80,17 +80,17 @@ impl SysInfo {
     }
 
     /// Generate sysinfo struct, will valid data
-    pub async fn new(app_envs: &AppEnv) -> Self {
+    pub async fn new(app_env: &AppEnv) -> Self {
         let (uptime, screen_status) = tokio::join!(Self::get_uptime(), Self::screen_status());
         Self {
             ip_address: local_ip().map_or_else(|_| S!("UNKNOWN"), |i| i.to_string()),
             uptime_app: std::time::SystemTime::now()
-                .duration_since(app_envs.start_time)
+                .duration_since(app_env.start_time)
                 .map_or(0, |value| value.as_secs()),
             screen_status,
             uptime,
-            time_on: (app_envs.time_on.hour(), app_envs.time_on.minute()),
-            time_off: (app_envs.time_off.hour(), app_envs.time_off.minute()),
+            time_on: (app_env.time_on.hour(), app_env.time_on.minute()),
+            time_off: (app_env.time_off.hour(), app_env.time_off.minute()),
             version: S!(env!("CARGO_PKG_VERSION")),
         }
     }
@@ -115,10 +115,10 @@ mod tests {
 
     #[tokio::test]
     async fn sysinfo_get_sysinfo_ok() {
-        let app_envs = test_setup();
+        let app_env = test_setup();
         sleep!(1000);
 
-        let result = SysInfo::new(&app_envs).await;
+        let result = SysInfo::new(&app_env).await;
 
         assert_eq!(result.version, env!("CARGO_PKG_VERSION"));
         assert_eq!(result.uptime_app, 1);

@@ -9,10 +9,10 @@ struct PostRequest<'a> {
 }
 
 impl<'a> From<&'a AppEnv> for PostRequest<'a> {
-    fn from(app_envs: &'a AppEnv) -> Self {
+    fn from(app_env: &'a AppEnv) -> Self {
         Self {
-            key: &app_envs.ws_apikey,
-            password: &app_envs.ws_password,
+            key: &app_env.ws_apikey,
+            password: &app_env.ws_password,
         }
     }
 }
@@ -24,7 +24,7 @@ struct PostResponse {
 }
 
 /// Make a https request to get an access token
-async fn get_auth_token(app_envs: &AppEnv) -> Result<String, AppError> {
+async fn get_auth_token(app_env: &AppEnv) -> Result<String, AppError> {
     Ok(reqwest::Client::builder()
         .connect_timeout(std::time::Duration::from_millis(5000))
         .gzip(true)
@@ -35,8 +35,8 @@ async fn get_auth_token(app_envs: &AppEnv) -> Result<String, AppError> {
             env!("CARGO_PKG_VERSION")
         ))
         .build()?
-        .post(&app_envs.ws_token_address)
-        .json(&PostRequest::from(app_envs))
+        .post(&app_env.ws_token_address)
+        .json(&PostRequest::from(app_env))
         .send()
         .await?
         .json::<PostResponse>()
@@ -45,12 +45,8 @@ async fn get_auth_token(app_envs: &AppEnv) -> Result<String, AppError> {
 }
 
 /// Connect to wesbsocket server
-pub async fn ws_upgrade(app_envs: &AppEnv) -> Result<WsStream, AppError> {
-    let url = format!(
-        "{}/{}",
-        app_envs.ws_address,
-        get_auth_token(app_envs).await?
-    );
+pub async fn ws_upgrade(app_env: &AppEnv) -> Result<WsStream, AppError> {
+    let url = format!("{}/{}", app_env.ws_address, get_auth_token(app_env).await?);
     let (socket, response) = connect_async(url)
         .await
         .map_err(|i| AppError::TungsteniteConnect(i.to_string()))?;

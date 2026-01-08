@@ -9,15 +9,15 @@ use crate::{app_env::AppEnv, ws_messages::to_struct};
 
 #[derive(Debug, Clone)]
 pub struct WSSender {
-    app_envs: AppEnv,
+    app_env: AppEnv,
     connected_instant: Instant,
     tx: Sender<Msg>,
 }
 
 impl WSSender {
-    pub fn new(app_envs: &AppEnv, tx: &Sender<Msg>) -> Self {
+    pub fn new(app_env: &AppEnv, tx: &Sender<Msg>) -> Self {
         Self {
-            app_envs: C!(app_envs),
+            app_env: C!(app_env),
             connected_instant: std::time::Instant::now(),
             tx: C!(tx),
         }
@@ -60,7 +60,7 @@ impl WSSender {
 
     /// Generate, and send, pi information
     pub async fn send_status(&self) {
-        let sys_info = SysInfo::new(&self.app_envs).await;
+        let sys_info = SysInfo::new(&self.app_env).await;
         let pi_info = PiStatus::new(sys_info, self.connected_instant.elapsed().as_secs());
         self.send_ws_response(Response::Status(pi_info)).await;
     }

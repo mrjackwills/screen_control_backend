@@ -22,15 +22,15 @@ pub struct SysInfo {
 impl SysInfo {
     /// Check the screen status, maybe put this value in an .env, as it can change depending which por
     pub async fn screen_status() -> Option<ScreenStatus> {
-        let get = |num: u8| async move {
-            read_to_string(format!("/sys/class/drm/card1-HDMI-A-{num}/enabled"))
+        let get = |card: u8, num: u8| async move {
+            read_to_string(format!("/sys/class/drm/card{card}-HDMI-A-{num}/enabled"))
                 .await
                 .unwrap_or_default()
                 .trim()
                 .to_owned()
         };
 
-        let status = <[String; 2]>::from(tokio::join!(get(1), get(2)));
+        let status = <[String; 4]>::from(tokio::join!(get(0, 1), get(0, 2), get(1, 1), get(1, 2)));
         if status.contains(&"enabled".into()) {
             Some(ScreenStatus::On)
         } else if status.contains(&"disabled".into()) {

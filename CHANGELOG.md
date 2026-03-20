@@ -1,3 +1,10 @@
+# <a href='https://github.com/mrjackwills/screen_control_backend/releases/tag/v0.2.2'>v0.2.2</a>
+### 2026-03-20
+
+### Chores
++ GitHub workflow updated, [6cc61fd0](https://github.com/mrjackwills/screen_control_backend/commit/6cc61fd06c9ded2fe364c7c3e37e3fdc6834b8dd)
++ dependencies updated, [c9c99846](https://github.com/mrjackwills/screen_control_backend/commit/c9c998462b3d9a14fdee298c94bfb5b654a56990)
+
 # <a href='https://github.com/mrjackwills/screen_control_backend/releases/tag/v0.2.1'>v0.2.1</a>
 ### 2026-01-08
 

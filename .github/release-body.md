@@ -1,7 +1,6 @@
-### 2026-03-20
+### 2026-04-29
 
 ### Chores
-+ GitHub workflow updated, [6cc61fd06c9ded2fe364c7c3e37e3fdc6834b8dd]
-+ dependencies updated, [c9c998462b3d9a14fdee298c94bfb5b654a56990]
++ dependencies updated, [p9eacb6c7a1df18c9a2d355fcaf8c8d4838bb326e]
 
 see <a href='https://github.com/mrjackwills/screen_control_backend/blob/main/CHANGELOG.md'>CHANGELOG.md</a> for more details

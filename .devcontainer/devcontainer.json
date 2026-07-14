@@ -1,42 +1,35 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.217.4/containers/rust
 {
 	"name": "Rust",
 	"build": {
-		"dockerfile": "Dockerfile",
-		"args": {
-			// Use the VARIANT arg to pick a Debian OS version: buster, bullseye
-			// Use bullseye when on local on arm64/Apple Silicon.
-			"VARIANT": "bullseye"
-		}
-		
+		"dockerfile": "Dockerfile"
 	},
 	"runArgs": [
 		"--cap-add=SYS_PTRACE",
 		"--security-opt",
 		"seccomp=unconfined"
 	],
-
-	// Set *default* container specific settings.json values on container create.
-
-	"mounts": [
-		"source=/run/shm,target=/dev/shm,type=bind",
-		"source=/etc/timezone,target=/etc/timezone,type=bind,readonly"
-	],
-
+	"postCreateCommand": "cargo install cross typos-cli",
 	"customizations": {
 		"vscode": {
+			// Add the IDs of extensions you want installed when the container is created.
 			"extensions": [
 				"adpyke.vscode-sql-formatter",
 				"bmuskalla.vscode-tldr",
 				"christian-kohler.path-intellisense",
 				"citreae535.sparse-crates",
-				"gruntfuggly.todo-tree",
+				"fanaticpythoner.better-todo-tree",
+				"foxundermoon.shell-format",
+				"ms-vscode.live-server",
 				"mutantdino.resourcemonitor",
 				"redhat.vscode-yaml",
 				"rust-lang.rust-analyzer",
 				"tamasfe.even-better-toml",
+				"timonwong.shellcheck",
 				"vadimcn.vscode-lldb"
 			],
+			// Set *default* container specific settings.json values on container create.
 			"settings": {
 				"lldb.executable": "/usr/bin/lldb",
 				// VS Code don't watch files under ./target
@@ -46,16 +39,16 @@
 			}
 		}
 	},
-
-	"postCreateCommand": "cargo install typos-cli cross",
-
 	// Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
 	"remoteUser": "vscode",
-
 	"features": {
-		"ghcr.io/devcontainers/features/docker-in-docker:2":{},
+		"ghcr.io/devcontainers/features/docker-in-docker:4": {
+			"version": "latest",
+			"moby": false,
+			"dockerDashComposeVersion": "v2"
+		},
 		"ghcr.io/devcontainers/features/git:1": {
-				"version":"os-provided"
-			}
+			"version": "os-provided"
+		}
 	}
 }

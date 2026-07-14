@@ -1,4 +1,3 @@
-use async_channel::Sender;
 use mimalloc::MiMalloc;
 
 #[global_allocator]
@@ -15,6 +14,7 @@ mod ws_messages;
 
 use app_env::AppEnv;
 use app_error::AppError;
+use async_channel::Sender;
 use cron::Croner;
 use simple_signal::Signal;
 use std::env::Args;

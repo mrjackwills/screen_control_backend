@@ -1,7 +1,10 @@
+# <a href='https://github.com/mrjackwills/screen_control_backend/releases/tag/v0.2.4'>v0.2.4</a>
+### 2026-07-14
+
 ### Chores
-+ Rust version bump, [24b6cfa037a15cee0f49d7d5b1754d3cc470f77b]
-+ dependencies updated, [79693c1fd7fa317a4c77c453f673ae5bf2f4b1a8]
-+ .devcontainer updated, [9daf53bde2194320f6c6b99c4723ab14b5e40f77]
++ Rust version bump, [24b6cfa0](https://github.com/mrjackwills/screen_control_backend/commit/24b6cfa037a15cee0f49d7d5b1754d3cc470f77b)
++ dependencies updated, [79693c1f](https://github.com/mrjackwills/screen_control_backend/commit/79693c1fd7fa317a4c77c453f673ae5bf2f4b1a8)
++ .devcontainer updated, [9daf53bd](https://github.com/mrjackwills/screen_control_backend/commit/9daf53bde2194320f6c6b99c4723ab14b5e40f77)
 
 # <a href='https://github.com/mrjackwills/screen_control_backend/releases/tag/v0.2.3'>v0.2.3</a>
 ### 2026-04-29
